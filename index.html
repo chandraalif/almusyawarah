@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Sholat Musholla Al Musyawarah Cluster Rosewood Cileungsi Hijau</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #020617;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+        .digital-clock {
+            font-family: 'Space Mono', sans-serif;
+        }
+        .prayer-card.active {
+            background: linear-gradient(135deg, #059669 0%, #064e3b 100%);
+            border-color: #10b981;
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.2);
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 40s linear infinite;
+        }
+        .fade-in {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(1.05); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .standby-mode {
+            background-color: black;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <!-- Standby Overlay -->
+    <div id="standbyOverlay" class="fixed inset-0 standby-mode hidden flex flex-col items-center justify-center text-center p-10">
+        <h1 class="text-7xl font-extrabold mb-8 text-emerald-500">WAKTUNYA SHOLAT</h1>
+        <p class="text-4xl text-gray-400">Mohon menonaktifkan atau senyapkan telepon genggam Anda.</p>
+        <div class="mt-20 border-t border-gray-800 pt-10">
+            <p class="text-3xl text-gray-600 italic">"Peliharalah semua sholat(mu), dan (peliharalah) sholat wusthaa."</p>
+        </div>
+    </div>
+
+    <!-- Header: Title & Time -->
+    <header class="h-[15%] flex items-center justify-between px-12 bg-slate-900/80 border-b border-emerald-900/30">
+        <div class="flex flex-row items-center gap-4">
+            <img src="logo-dkm.png" alt="Icon Musholla Al Musyawarah" class="w-20 h-20 bg-white rounded-lg p-1">
+            <div class="flex flex-col">
+                <h1 class="text-5xl font-black text-white">Musholla Al Musyawarah</h1>
+                <p class="text-2xl text-emerald-500 font-medium">Cluster Rosewood, Cileungsi Hijau</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <div id="digitalClock" class="digital-clock text-7xl font-bold text-white leading-none">00:00:00</div>
+            <div id="currentDate" class="text-2xl text-emerald-400 font-semibold mt-1">---</div>
+        </div>
+    </header>
+
+    <!-- Main Content: Split Layout -->
+    <main class="h-[75%] flex flex-row overflow-hidden">
+        <!-- Left Side: Full Image Slider -->
+        <section class="w-1/2 h-full bg-slate-950 relative overflow-hidden border-r border-emerald-900/20">
+            <div class="w-full h-full p-8">
+                <div id="photoSlider" class="w-full h-full overflow-hidden rounded-2xl border border-slate-700">
+                    <!-- Foto akan dimasukkan di sini -->
+                </div>
+            </div>
+            <!-- Countdown Overlay (Only shows when near prayer time) -->
+            <div id="countdownContainer" class="hidden absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center text-center p-8 z-20">
+                <h2 id="countdownLabel" class="text-4xl font-bold text-emerald-400 mb-6 uppercase tracking-widest">Menuju Adzan</h2>
+                <div id="countdownTimer" class="digital-clock text-[10rem] font-black text-white leading-none">15:00</div>
+            </div>
+        </section>
+
+        <!-- Right Side: Prayer Schedule -->
+        <section class="w-1/2 h-full p-8 flex flex-col justify-center gap-4 bg-slate-900/30">
+            <div class="grid grid-cols-1 gap-4 h-full">
+                <div id="card-Subuh" class="prayer-card bg-slate-800/40 px-10 py-6 rounded-3xl border border-slate-700 flex justify-between items-center transition-all duration-700">
+                    <span class="text-4xl font-bold text-slate-300">SUBUH</span>
+                    <span id="time-Subuh" class="text-6xl font-black text-white">--:--</span>
+                </div>
+                <div id="card-Terbit" class="prayer-card bg-slate-800/40 px-10 py-6 rounded-3xl border border-slate-700 flex justify-between items-center opacity-70">
+                    <span class="text-3xl font-bold text-slate-400 tracking-wider">TERBIT</span>
+                    <span id="time-Terbit" class="text-5xl font-black text-slate-300">--:--</span>
+                </div>
+                <div id="card-Dhuhr" class="prayer-card bg-slate-800/40 px-10 py-6 rounded-3xl border border-slate-700 flex justify-between items-center transition-all duration-700">
+                    <span class="text-4xl font-bold text-slate-300">DZUHUR</span>
+                    <span id="time-Dhuhr" class="text-6xl font-black text-white">--:--</span>
+                </div>
+                <div id="card-Asr" class="prayer-card bg-slate-800/40 px-10 py-6 rounded-3xl border border-slate-700 flex justify-between items-center transition-all duration-700">
+                    <span class="text-4xl font-bold text-slate-300">ASHAR</span>
+                    <span id="time-Asr" class="text-6xl font-black text-white">--:--</span>
+                </div>
+                <div id="card-Maghrib" class="prayer-card bg-slate-800/40 px-10 py-6 rounded-3xl border border-slate-700 flex justify-between items-center transition-all duration-700">
+                    <span class="text-4xl font-bold text-slate-300">MAGHRIB</span>
+                    <span id="time-Maghrib" class="text-6xl font-black text-white">--:--</span>
+                </div>
+                <div id="card-Isha" class="prayer-card bg-slate-800/40 px-10 py-6 rounded-3xl border border-slate-700 flex justify-between items-center transition-all duration-700">
+                    <span class="text-4xl font-bold text-slate-300">ISYA</span>
+                    <span id="time-Isha" class="text-6xl font-black text-white">--:--</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer: Running Text -->
+    <footer class="h-[10%] bg-emerald-700 flex items-center overflow-hidden border-t-4 border-emerald-500">
+        <div id="runningTextContainer" class="animate-marquee whitespace-nowrap text-4xl font-extrabold uppercase tracking-tight text-white px-4">
+            Selamat Datang di Musholla Al-Musyawarah • Mari luruskan shaf dan rapatkan barisan demi kesempurnaan sholat • Kebersihan mushalla adalah tanggung jawab kita bersama.
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * PENGATURAN / CONFIGURATION
+         */
+        const CONFIG = {
+            latitude: -6.4025,
+            longitude: 106.9925,
+            locationName: 'Cileungsi',
+            iqomahWait: 10, // Menit standby sebelum iqomah sholat
+            standbyDuration: 10, // Durasi standby setelah iqomah
+            countdownStartMins: 15,
+            runningText: "Selamat Datang di Musholla Al-Musyawarah • Mari luruskan shaf dan rapatkan barisan • Mohon matikan HP saat berada di dalam Mushalla.",
+            photos: [
+                "kajian-quran.jpeg",
+                "sholat-berjamaah.jpeg"
+            ]
+        };
+
+        let prayerTimes = {};
+        let photoIndex = 0;
+
+        // 1. Sinkronisasi Waktu
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/\./g, ':');
+            
+            const clockEl = document.getElementById('digitalClock');
+            if (clockEl) clockEl.textContent = timeStr;
+
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateEl = document.getElementById('currentDate');
+            if (dateEl) dateEl.textContent = now.toLocaleDateString('id-ID', dateOptions);
+
+            checkPrayerStatus(now);
+        }
+
+        // 2. Ambil Jadwal Sholat API
+        async function fetchPrayerTimes() {
+            try {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth() + 1;
+                const url = `https://api.aladhan.com/v1/calendar?latitude=${CONFIG.latitude}&longitude=${CONFIG.longitude}&method=11&month=${month}&year=${year}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data && data.data) {
+                    const todayData = data.data[now.getDate() - 1].timings;
+                    const cleanTimings = {};
+                    for (let key in todayData) {
+                        cleanTimings[key] = todayData[key].split(' ')[0];
+                    }
+                    prayerTimes = cleanTimings;
+                    updatePrayerDisplay();
+                }
+            } catch (error) {
+                console.error("Gagal mengambil data jadwal sholat", error);
+            }
+        }
+
+        function updatePrayerDisplay() {
+            const map = {
+                'Subuh': 'Fajr',
+                'Terbit': 'Sunrise',
+                'Dhuhr': 'Dhuhr',
+                'Asr': 'Asr',
+                'Maghrib': 'Maghrib',
+                'Isha': 'Isha'
+            };
+
+            for (let id in map) {
+                const element = document.getElementById(`time-${id}`);
+                const timeValue = prayerTimes[map[id]];
+                if (element && timeValue) element.textContent = timeValue;
+            }
+        }
+
+        // 3. Logika Countdown & Standby
+        function checkPrayerStatus(now) {
+            if (!prayerTimes.Fajr) return;
+
+            const prayers = [
+                { id: 'Subuh', label: 'Subuh', time: prayerTimes.Fajr },
+                { id: 'Dhuhr', label: 'Dzuhur', time: prayerTimes.Dhuhr },
+                { id: 'Asr', label: 'Ashar', time: prayerTimes.Asr },
+                { id: 'Maghrib', label: 'Maghrib', time: prayerTimes.Maghrib },
+                { id: 'Isha', label: 'Isya', time: prayerTimes.Isha }
+            ];
+
+            const nowTime = now.getHours() * 60 + now.getMinutes();
+            const nowSec = now.getSeconds();
+            let foundNext = false;
+            let isStandbyActive = false;
+
+            prayers.forEach(p => {
+                const card = document.getElementById(`card-${p.id}`);
+                if (!card) return;
+
+                const [h, m] = p.time.split(':').map(Number);
+                const pTime = h * 60 + m;
+                const diff = pTime - nowTime;
+
+                card.classList.remove('active');
+
+                // Cek Standby (Waktu Sholat sedang berlangsung)
+                if (diff <= 0 && diff > -(CONFIG.iqomahWait + CONFIG.standbyDuration)) {
+                    isStandbyActive = true;
+                }
+
+                // Cek Countdown ke sholat berikutnya
+                if (!foundNext && diff >= 0) {
+                    foundNext = true;
+                    card.classList.add('active');
+
+                    if (diff <= CONFIG.countdownStartMins) {
+                        showCountdown(true, p.label, diff, 60 - nowSec);
+                    } else {
+                        showCountdown(false);
+                    }
+                }
+            });
+
+            showStandby(isStandbyActive);
+        }
+
+        function showCountdown(show, name, mins, secs) {
+            const container = document.getElementById('countdownContainer');
+            const label = document.getElementById('countdownLabel');
+            const timer = document.getElementById('countdownTimer');
+
+            if (show) {
+                container.classList.remove('hidden');
+                label.textContent = `Menuju Adzan ${name}`;
+                const s = secs === 60 ? 0 : secs;
+                const m = secs === 60 ? mins : mins - 1;
+                timer.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function showStandby(show) {
+            const overlay = document.getElementById('standbyOverlay');
+            if (show) overlay.classList.remove('hidden');
+            else overlay.classList.add('hidden');
+        }
+
+        // 4. Logika Slider Foto
+        function initSlider() {
+            if (CONFIG.photos.length > 0) {
+                updateSlider();
+                setInterval(updateSlider, 20000); // Ganti foto tiap 20 detik
+            }
+        }
+
+        function updateSlider() {
+            const container = document.getElementById('photoSlider');
+            if (!container) return;
+
+            const photoUrl = CONFIG.photos[photoIndex];
+            container.innerHTML = `
+                <div class="fade-in w-full h-full">
+                    <img src="${photoUrl}" class="w-full h-full object-cover">
+                </div>
+            `;
+            photoIndex = (photoIndex + 1) % CONFIG.photos.length;
+        }
+
+        // Mulai Aplikasi
+        window.onload = () => {
+            fetchPrayerTimes();
+            initSlider();
+            const rtContainer = document.getElementById('runningTextContainer');
+            if (rtContainer) rtContainer.textContent = CONFIG.runningText;
+            
+            setInterval(updateClock, 1000);
+            setInterval(fetchPrayerTimes, 3600000); // Update jadwal tiap jam
+        };
+    </script>
+</body>
+</html>
