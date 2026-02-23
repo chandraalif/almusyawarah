@@ -406,16 +406,40 @@
             photoIndex = (photoIndex + 1) % CONFIG.photos.length;
         }
 
-        // Fungsi Fullscreen
+        // Fungsi Fullscreen dengan support cross-browser
         function toggleFullScreen() {
             audioPermissionGranted = true; // Izinkan audio saat interaksi
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-                });
+            const el = document.documentElement;
+            
+            // Check if currently in fullscreen
+            const isFullscreen = document.fullscreenElement || 
+                                 document.webkitFullscreenElement || 
+                                 document.mozFullScreenElement || 
+                                 document.msFullscreenElement;
+
+            if (!isFullscreen) {
+                // Enter fullscreen with fallbacks
+                if (el.requestFullscreen) {
+                    el.requestFullscreen().catch(err => {
+                        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+                    });
+                } else if (el.webkitRequestFullscreen) {
+                    el.webkitRequestFullscreen();
+                } else if (el.mozRequestFullScreen) {
+                    el.mozRequestFullScreen();
+                } else if (el.msRequestFullscreen) {
+                    el.msRequestFullscreen();
+                }
             } else {
+                // Exit fullscreen with fallbacks
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
                 }
             }
         }
